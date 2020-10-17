@@ -1,32 +1,25 @@
 /* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
+ * Assignment #3
+ * Luca Andriotto
  * ========================================
 */
 
 #include "interrupt.h"
 
+extern uint8_t isByteReceived;
+extern uint8_t isTimeout, countByte;
+extern uint8_t isSequenceReceived;
+
+/* ================================== ISR ================================== */
+
+// USED IN ORDER TO SET THE FLAG WHEN DATA ARE RECEIVED
 CY_ISR_PROTO(SERIAL_ISR){
-    // settare flag
-    if(UART_ReadRxStatus()==UART_RX_STS_FIFO_NOTEMPTY){
+    if(UART_ReadRxStatus()==UART_RX_STS_FIFO_NOTEMPTY)
         isByteReceived=1;
-    }
 }
 
+// USED TO SET FLAG WHEN TIMEOUT IS OCCURRING
 CY_ISR_PROTO(Ti_LED_ISR){
     T_LED_ReadStatusRegister();
     isTimeout=1;
 }
-
-//CY_ISR_PROTO(Ti_ISR){
-//    Timer_ReadStatusRegister();
-//    isTimeout=1;
-//}
-
-/* [] END OF FILE */

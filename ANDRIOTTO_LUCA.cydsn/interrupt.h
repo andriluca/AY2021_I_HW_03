@@ -1,25 +1,17 @@
 /* ========================================
- *
- * Copyright YOUR COMPANY, THE YEAR
- * All Rights Reserved
- * UNPUBLISHED, LICENSED SOFTWARE.
- *
- * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * WHICH IS THE PROPERTY OF your company.
- *
+ * Assignment #3
+ * Luca Andriotto
  * ========================================
 */
-#ifndef __INTERRUPT_H_
-    #define __INTERRUPT_H_
+
+#ifndef __INTERRUPT_H
+    #define __INTERRUPT_H
+    #define MAXBYTES 5          // MAXIMAL LENGTH OF THE PACKET
     #include "cytypes.h"
     #include "UART.h"
     #include "T_LED.h"
-    uint8_t isByteReceived, countByte;
-    uint8_t isTimeout;
-    CY_ISR_PROTO(SERIAL_ISR);
+    #include "EEPROM.h"
+    
+    CY_ISR_PROTO(SERIAL_ISR);   // ISR DECLARATIONS
     CY_ISR_PROTO(Ti_LED_ISR);
-    //CY_ISR_PROTO(Ti_ISR); 
 #endif
-
-
-/* [] END OF FILE */
