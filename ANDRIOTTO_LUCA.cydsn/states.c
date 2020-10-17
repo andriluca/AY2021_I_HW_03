@@ -20,9 +20,9 @@ uint8_t isSequenceReceived;             // ISSEQUENCERECEIVED: 0 -> SEQUENCE HAS
 
 static char message[21]="RGB LED Program $$$\r\n";      // HANDSHAKE MESSAGE
 
-extern Color color;                     // COLLECTED STRUCTURED DATA (PWM COMPARES)
+extern uint8_t rgb[3];                  // COLLECTED STRUCTURED DATA (PWM COMPARES)
 
-#define STARTCOUNTER 0xFF               // STARTING POINT (AND PERIOD) OF THE TIMER
+#define STARTCOUNTER 0xFF               // STARTING POINT OF THE TIMER
 
 void doTimerReset();
 
@@ -32,7 +32,7 @@ void doInit(){
     //Timer
     T_LED_ISR_StartEx(Ti_LED_ISR);
     T_LED_Start();
-    T_LED_WritePeriod(STARTCOUNTER);
+    //T_LED_WritePeriod(STARTCOUNTER);
 
     // UART
     UART_ISR_StartEx(SERIAL_ISR);
@@ -40,10 +40,7 @@ void doInit(){
     
     // PWMS and LED Status
     RGB_PWM_Start();
-    color.red = 0;
-    color.blue = 0;
-    color.green = 0;
-    RGB_PWM_WriteCMP();
+    RGB_PWM_WriteCMP(0,0,0);
     
     // Variables
     isConnected = 0;
@@ -58,40 +55,40 @@ void doInit(){
 /* ===================================== STATES ===================================== */
 
 // _S0_: CHECKING IF COMPUTER PROGRAM IS RUNNING
-_Bool onHandshake(){
-    return isByteReceived && !isConnected && UART_ReadRxData()=='v';
+_Bool onHandshake(){                                                            // 1. if
+    return isByteReceived && !isConnected && UART_ReadRxData()=='v';            // 'v' as input
 }
 
-// PREPARING FOR IDLE STATE
-_Bool onPreIdle(){
-    return (isByteReceived && !isConnected && UART_ReadRxData() == 'v')
-        || (isConnected && isTimeout && countByte < MAXBYTES) 
-        || isTransmissionSuccessful;
+// _S1.1_: PREPARING FOR IDLE STATE
+_Bool onPreIdle(){                                                              // 2. if
+    return (isByteReceived && !isConnected && UART_ReadRxData() == 'v')         // 'v' as input
+        || (isConnected && isTimeout && countByte < MAXBYTES)                   // or timeout reached
+        || isTransmissionSuccessful;                                            // or packet transmitted
 }
 
-// _S1_: IDLE --> DOING NOTHING
+// _S1.2_: IDLE --> DOING NOTHING
 
 // _S2_: RECEIVING SEQUENCE STARTING BYTE
-_Bool onReceivingFirst(){
-    return isByteReceived
-        && isConnected 
+_Bool onReceivingFirst(){                                                       // 3. if
+    return isByteReceived                                                       // 0xA0 as input
+        && isConnected
         && isSequenceReceived == 0
         && UART_ReadRxData() == 0xA0;
 }
 
-// _S3, S4, S6_: RECEIVING RGB VALUES
+// _S3, S4, S5_: RECEIVING RGB VALUES
 _Bool onReceivingComponents(){
-    return isByteReceived
-        && isConnected 
+    return isByteReceived                                                       // 4. if
+        && isConnected                                                          // new byte in input
         && isSequenceReceived == 1
         && !isTimeout 
         && countByte < 3;
 }
 
-// _S7_: RECEIVING SEQUENCE ENDING BYTE
+// _S6_: RECEIVING SEQUENCE ENDING BYTE
 _Bool onReceivingFifth(){
-    return isByteReceived
-        && isConnected 
+    return isByteReceived                                                       // 5. if
+        && isConnected                                                          // 0xC0 as input
         && countByte == 3 
         && isSequenceReceived == 2
         && UART_ReadRxData() == 0xC0;
@@ -100,50 +97,42 @@ _Bool onReceivingFifth(){
 
 /* =============================== STATES' PROCEDURES =============================== */
 
-void doHandshake(){
+void doHandshake(){                             // 1 --> Sending the keyword
     UART_ClearRxBuffer();
     UART_PutString(message);
 }
 
-void doPreIdle(){
-    doTimerReset();
-    countByte= MAXBYTES;
+void doPreIdle(){                               // 2 --> Preparing for Idle
+    countByte = MAXBYTES;
     isSequenceReceived=0;
     isConnected = 1;
     isTransmissionSuccessful=0;
 }
 
 
-void doReceivingFirst(){
+void doReceivingFirst(){                        // 3 --> Receiving starting byte
     doTimerReset();
     isSequenceReceived=1;
     countByte=0;
 }
 
-void doReceivingComponents(){
-    switch(countByte){
-        case 0: color.red=UART_ReadRxData();
-                break;
-        case 1: color.green=UART_ReadRxData();
-                break;
-        case 2: color.blue=UART_ReadRxData();
-                isSequenceReceived=2;
-                break;
-    }
+void doReceivingComponents(){                   // 4 --> Receiving 3 bytes as a sequence
+    rgb[countByte]=UART_ReadRxData();           // iteratively populating the rgb array
+    if(countByte==2) isSequenceReceived=2;      // when string is complete isSequenceReceived is set to 2
     doTimerReset();
     countByte++;
 }
 
-void doReceivingFifth(){
+void doReceivingFifth(){                        // 5 --> Receiving last byte
     doTimerReset();
     isTransmissionSuccessful=1;
-    RGB_PWM_WriteCMP();
+    RGB_PWM_WriteCMP(rgb[0],rgb[1],rgb[2]);
 }
 /* ============================= END STATES' PROCEDURES ============================= */
 
 /* ====================================== MISC ====================================== */
 
-void doTimerReset(){
+void doTimerReset(){                            // Resetting timer and clearing read buffer
     UART_ClearRxBuffer();
     isTimeout=0;
     isByteReceived=0;
@@ -151,5 +140,3 @@ void doTimerReset(){
 }
 
 /* ==================================== END MISC ==================================== */
-
-/* [] END OF FILE */

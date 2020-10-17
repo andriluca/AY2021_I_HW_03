@@ -8,7 +8,7 @@
 #include "PWM_RG.h"
 #include "PWM_B.h"
 
-Color color;
+uint8_t rgb[3];
 
 // INITIALIZATION OF THE PWMS
 void RGB_PWM_Start(){
@@ -17,8 +17,8 @@ void RGB_PWM_Start(){
 }
 
 // SETTING THE VALUE
-void RGB_PWM_WriteCMP(){
-    PWM_RG_WriteCompare1(color.red);
-    PWM_RG_WriteCompare2(color.green);
-    PWM_B_WriteCompare(color.blue);
+void RGB_PWM_WriteCMP(uint8_t r, uint8_t g, uint8_t b){
+    PWM_RG_WriteCompare1(r);
+    PWM_RG_WriteCompare2(g);
+    PWM_B_WriteCompare(b);
 }
