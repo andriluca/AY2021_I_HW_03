@@ -74,7 +74,7 @@ void doStateMachine(){
     if(onHandshake())
         doHandshake();
         
-    // PRE-IDLE -> PREPARING VARIABLES FOR IDLE
+    // PRE-IDLE --> PREPARING VARIABLES FOR IDLE
     if(onPreIdle())
         doPreIdle();        
         
@@ -106,24 +106,24 @@ _Bool onPreIdle(){                                                              
 // _S1.2_: IDLE --> DOING NOTHING
 
 // _S2_: RECEIVING SEQUENCE STARTING BYTE
-_Bool onReceivingFirst(){
-    return isByteReceived
+_Bool onReceivingFirst(){							// 3. if
+    return isByteReceived							// 0xA0 as first input
         && isConnected
         && countByte == TRIGGERBYTES
         && UART_ReadRxData() == 0xA0;
 }
 
 // _S3, S4, S5_: RECEIVING RGB VALUES
-_Bool onReceivingComponents(){
-    return isByteReceived
+_Bool onReceivingComponents(){							// 4. if
+    return isByteReceived							// Three new incoming bytes
         && isConnected
         && countByte < 3
         && !isTimeout;
 }
 
 // _S6_: RECEIVING SEQUENCE ENDING BYTE
-_Bool onReceivingFifth(){
-    return isByteReceived
+_Bool onReceivingFifth(){							// 5.
+    return isByteReceived							// 0xC0 as last input
         && isConnected
         && countByte == 3
         && UART_ReadRxData() == 0xC0;

@@ -10,7 +10,7 @@
 
 extern uint8_t rgb[3];
 
-// INITIALIZATION OF THE PWMS
+// INITIALIZATION OF PWMS
 void RGB_PWM_Start(){
     PWM_RG_Start();
     PWM_B_Start();
