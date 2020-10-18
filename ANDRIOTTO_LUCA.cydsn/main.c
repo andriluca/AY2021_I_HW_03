@@ -9,25 +9,7 @@
 #include "states.h"
 
 int main(void){
-    CyGlobalIntEnable; 
-    // INITIALIZATION OF PERIPHERALS AND VARIABLES
-    doInit();
-    
-    for(;;){
-        // APP/MICROCONTROLLER HANDSHAKE
-        if(onHandshake())
-           doHandshake();
         
-        // PRE-IDLE -> PREPARING VARIABLES FOR IDLE
-        if(onPreIdle())
-           doPreIdle();        
-        
-        // HANDLING INCOMING BYTES
-        if(onReceivingFirst())
-            doReceivingFirst(); 
-        if(onReceivingComponents())
-            doReceivingComponents(); 
-        if(onReceivingFifth())
-            doReceivingFifth(); 
-    }
+    doInit();                   // INITIALIZING PERIPHERALS AND VARIABLES
+    for(;;) doStateMachine();   // EXECUTING THE STATE MACHINE
 }

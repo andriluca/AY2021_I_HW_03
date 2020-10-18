@@ -9,7 +9,7 @@
     
     #include "cytypes.h"
     
- // SOME USEFUL PROCEDURES TO HELP HANDLING THE PWMS   
+ // SOME PROCEDURES TO HELP HANDLING THE PWMS   
     void RGB_PWM_Start();
     void RGB_PWM_WriteCMP(uint8_t r, uint8_t g, uint8_t b);
     
