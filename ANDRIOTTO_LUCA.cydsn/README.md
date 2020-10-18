@@ -16,6 +16,8 @@ L'interfaccia impiegata consente, verificata la connessione del microcontrollore
 - S5: _Lettura Blue_
 - S6: _Fine lettura_
 
+_NB_: per ulteriori informazioni riguardanti le variabili e procedure coinvolte fare riferimento al file "states.c".
+
 ### Handshake
 
 La connessione tra i due dispositivi viene riconosciuta nel momento in cui il PC invia un carattere al controllore e quest'ultimo risponde con una determinata stringa, una keyword.
@@ -41,3 +43,8 @@ Quando il carattere tail viene letto i valori vengono scritti nelle compare dell
 ## Timing
 
 L'aspetto temporale è predominante in questo progetto. I dati vengono inviati serialmente dal computer, quindi è necessario stabilire, oltre ad un timeout massimo un minimo valore temporale al di sotto del quale i dati non possono essere registrati in memoria. Questo è il limite principale dell'hardware. Facendo vari test con coolterm ho ricavato empiricamente che il limite inferiore si aggira all'incirca su 10 ms.
+
+## Impostazione del colore
+
+L'ultimo stato ha come fine ultimo la scrittura dei valori di compare su due differenti PWM (la prima per rosso e verde e la seconda per il blu).
+Il periodo è stato impostato nell'ordine dei kHz in modo tale da alternare rapidamente fasi di accensione e fase di spegnimento, in modo indistinguibile dall'occhio umano. In questo modo l'intensità luminosa dipende dal tempo medio di attivazione dei channel.
