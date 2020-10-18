@@ -12,4 +12,5 @@ int main(void){
         
     doInit();                   // INITIALIZING PERIPHERALS AND VARIABLES
     for(;;) doStateMachine();   // EXECUTING THE STATE MACHINE
+
 }
