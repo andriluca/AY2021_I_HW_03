@@ -8,8 +8,6 @@
 #include "PWM_RG.h"
 #include "PWM_B.h"
 
-extern uint8_t rgb[3];
-
 // INITIALIZATION OF PWMS
 void RGB_PWM_Start(){
     PWM_RG_Start();
